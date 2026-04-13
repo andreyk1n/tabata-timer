@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabata Timer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <div class="app">
+        <div class="app__desktop-wrapper">
+            <div class="app__info-panel">
+                <div>
+                    <div class="app__info-title">TABATA<br><span>TIMER</span></div>
+                    <p class="app__info-desc">
+                        High-intensity interval training. Налаштуй свій ритм, запусти таймер — і дій.
+                    </p>
+                </div>
+                <div class="app__info-stats" id="desktopStats">
+                    <div class="app__stat-card">
+                        <div class="app__stat-label">Робота</div>
+                        <div class="app__stat-value app__stat-value--green" id="deskWork">01:00</div>
+                    </div>
+                    <div class="app__stat-card">
+                        <div class="app__stat-label">Відпочинок</div>
+                        <div class="app__stat-value app__stat-value--red" id="deskRest">00:45</div>
+                    </div>
+                    <div class="app__stat-card">
+                        <div class="app__stat-label">Вправи</div>
+                        <div class="app__stat-value app__stat-value--orange" id="deskExercises">3</div>
+                    </div>
+                    <div class="app__stat-card">
+                        <div class="app__stat-label">Раунди</div>
+                        <div class="app__stat-value app__stat-value--blue" id="deskRounds">6×</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app__phone">
+                <div class="screen screen--active" id="screenSetup">
+                    <div class="setup">
+                        <div class="setup__header">
+                            <button class="setup__menu-btn" aria-label="Menu">
+                                <span></span><span></span><span></span>
+                            </button>
+                            <span class="setup__title">Tabata Timer</span>
+                            <div style="width:30px"></div>
+                        </div>
+                        <div class="setup__timer-display">
+                            <div class="setup__total-time" id="totalTimeDisplay">34:30</div>
+                        </div>
+                        <div class="setup__card">
+                            <button class="setup__load-btn">
+                                <span style="display:flex;align-items:center;gap:8px;">
+                                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" stroke="#8B90A7"
+                                            stroke-width="2" />
+                                        <path d="M8 2v4M16 2v4M3 10h18" stroke="#8B90A7" stroke-width="2"
+                                            stroke-linecap="round" />
+                                    </svg>
+                                    Load Previous Workout
+                                </span>
+                                <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
+                                    <path d="M9 18l6-6-6-6" stroke="#8B90A7" stroke-width="2" stroke-linecap="round" />
+                                    <path d="M15 18l6-6-6-6" stroke="#8B90A7" stroke-width="2" stroke-linecap="round" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="setup__card">
+                            <div class="setup__grid">
+                                <div class="setup__field">
+                                    <div class="setup__field-header">
+                                        <div class="setup__field-icon setup__field-icon--green">▶</div>
+                                        <span class="setup__field-label">Work</span>
+                                    </div>
+                                    <div class="setup__field-value setup__field-value--green" id="fieldWork"
+                                        onclick="openModal('work')">01:00</div>
+                                </div>
+                                <div class="setup__field">
+                                    <div class="setup__field-header">
+                                        <div class="setup__field-icon setup__field-icon--red">⏸</div>
+                                        <span class="setup__field-label">Rest</span>
+                                    </div>
+                                    <div class="setup__field-value setup__field-value--red" id="fieldRest"
+                                        onclick="openModal('rest')">00:45</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="setup__card">
+                            <div class="setup__grid">
+                                <div class="setup__field">
+                                    <div class="setup__field-header">
+                                        <div class="setup__field-icon setup__field-icon--orange">⚡</div>
+                                        <span class="setup__field-label">Exercises</span>
+                                    </div>
+                                    <div class="setup__field-value setup__field-value--white" id="fieldExercises"
+                                        onclick="openModal('exercises')">3</div>
+                                </div>
+                                <div class="setup__field">
+                                    <div class="setup__field-header">
+                                        <div class="setup__field-icon setup__field-icon--blue">↺</div>
+                                        <span class="setup__field-label">Rounds</span>
+                                    </div>
+                                    <div class="setup__field-value setup__field-value--blue" id="fieldRounds"
+                                        onclick="openModal('rounds')">6X</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="setup__card">
+                            <div class="setup__grid">
+                                <div class="setup__field">
+                                    <div class="setup__field-header">
+                                        <div class="setup__field-icon setup__field-icon--orange">🕐</div>
+                                        <span class="setup__field-label">Round Reset</span>
+                                    </div>
+                                    <div class="setup__field-value setup__field-value--orange" id="fieldRoundReset"
+                                        onclick="openModal('roundReset')">01:30</div>
+                                </div>
+                                <div class="setup__field">
+                                    <div class="setup__field-header">
+                                        <div class="setup__field-icon setup__field-icon--sound">🔊</div>
+                                        <span class="setup__field-label">Sound</span>
+                                    </div>
+                                    <div class="setup__field-value setup__field-value--white">EN</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="setup__start-btn" onclick="startTimer()">
+                            <svg width="20" height="20" fill="white" viewBox="0 0 24 24">
+                                <path d="M5 3l14 9-14 9V3z" />
+                            </svg>
+                            Start
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ===== TIMER SCREEN ===== -->
+                <div class="screen timer timer--work" id="screenTimer">
+                    <div class="timer__header">
+                        <div class="timer__phase-title" id="timerPhaseTitle">Work</div>
+                        <div class="timer__badges">
+                            <div class="timer__badge">
+                                <div class="timer__badge-icon">⚡</div>
+                                <div class="timer__badge-content">
+                                    <div class="timer__badge-label">Exercise</div>
+                                    <div class="timer__badge-value" id="badgeExercise">1/3</div>
+                                </div>
+                            </div>
+                            <div class="timer__badge">
+                                <div class="timer__badge-icon">↺</div>
+                                <div class="timer__badge-content">
+                                    <div class="timer__badge-label">Round</div>
+                                    <div class="timer__badge-value" id="badgeRound">1/6</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timer__circle-wrap">
+                        <svg class="timer__svg" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+                            <circle class="timer__circle-dashes" cx="110" cy="110" r="100" />
+                            <circle class="timer__circle-bg" cx="110" cy="110" r="100" />
+                            <circle class="timer__circle-progress" id="timerProgress" cx="110" cy="110" r="110"
+                                style="stroke-dasharray:691.15" />
+                        </svg>
+                        <div class="timer__center">
+                            <div class="timer__phase-label" id="timerPhaseLabel">WORK</div>
+                            <div class="timer__countdown" id="timerCountdown">00:00</div>
+                            <div class="timer__total-remaining">
+                                <span>⏱</span> <span id="timerTotalRemaining">00:00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timer__exercise-name" id="timerExerciseName">EXERCISE 1</div>
+
+                    <div class="timer__up-next" id="timerUpNextWrap">
+                        <div class="timer__up-next-label">UP NEXT</div>
+                        <div class="timer__up-next-value" id="timerUpNext">EXERCISE 2</div>
+                    </div>
+
+                    <div class="timer__controls">
+                        <button class="timer__btn timer__btn--sound" onclick="toggleSound()" id="soundBtn"
+                            aria-label="Sound">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z" />
+                            </svg>
+                        </button>
+                        <button class="timer__btn timer__btn--play" onclick="togglePause()" id="playBtn"
+                            aria-label="Pause">
+                            <svg width="28" height="28" fill="currentColor" viewBox="0 0 24 24" id="playIcon">
+                                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                            </svg>
+                        </button>
+                        <button class="timer__btn timer__btn--skip" onclick="skipPhase()" aria-label="Skip">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M6 18l8.5-6L6 6v12zm2-8.14L11.03 12 8 14.14V9.86zM16 6h2v12h-2z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="screen complete" id="screenComplete">
+                    <div class="complete__top">
+                        <div class="complete__confetti" id="confettiContainer"></div>
+                        <div class="complete__check">
+                            <div class="complete__check-inner">
+                                <svg width="36" height="36" fill="none" viewBox="0 0 24 24">
+                                    <path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="complete__title">Complete</div>
+                    </div>
+
+                    <div class="complete__bottom">
+                        <div class="complete__stats">
+                            <div class="complete__stat">
+                                <div class="complete__stat-icon complete__stat-icon--green">
+                                    <svg width="18" height="18" fill="#00D68F" viewBox="0 0 24 24">
+                                        <path d="M13 2.05A10 10 0 0121.95 11H13V2.05z" />
+                                        <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10"
+                                            stroke="#00D68F" stroke-width="2" stroke-linecap="round" />
+                                    </svg>
+                                </div>
+                                <div class="complete__stat-value complete__stat-value--green">1</div>
+                                <div class="complete__stat-label">Days in a row</div>
+                            </div>
+                            <div class="complete__stat">
+                                <div class="complete__stat-icon complete__stat-icon--red">
+                                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
+                                        <path
+                                            d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                                            fill="#FF4757" />
+                                    </svg>
+                                </div>
+                                <div class="complete__stat-value complete__stat-value--red" id="completedWorkouts">1
+                                </div>
+                                <div class="complete__stat-label">Total workouts completed</div>
+                            </div>
+                            <div class="complete__stat">
+                                <div class="complete__stat-icon complete__stat-icon--blue">
+                                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
+                                        <circle cx="12" cy="12" r="10" stroke="#4ecdc4" stroke-width="2" />
+                                        <path d="M12 6v6l4 2" stroke="#4ecdc4" stroke-width="2"
+                                            stroke-linecap="round" />
+                                    </svg>
+                                </div>
+                                <div class="complete__stat-value complete__stat-value--blue" id="completeTotalTime">
+                                    00:00</div>
+                                <div class="complete__stat-label">Total workout time</div>
+                            </div>
+                        </div>
+
+                        <div class="complete__divider"></div>
+
+                        <div class="complete__reminder">
+                            <span class="complete__reminder-text">Remind me to workout at the same time tomorrow</span>
+                            <button class="toggle" id="reminderToggle"
+                                onclick="this.classList.toggle('toggle--on');this.querySelector('.toggle__knob').style.transform=this.classList.contains('toggle--on')?'translateX(18px)':''">
+                                <span class="toggle__knob"></span>
+                            </button>
+                        </div>
+
+                        <div class="complete__actions">
+                            <button class="complete__btn complete__btn--outline" onclick="showSetup()">SHOW
+                                HISTORY</button>
+                            <button class="complete__btn complete__btn--fill" onclick="showSetup()">DONE</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal" id="editModal" onclick="closeModal(event)">
+                    <div class="modal__sheet">
+                        <div class="modal__handle"></div>
+                        <div class="modal__title" id="modalTitle">Work Duration</div>
+                        <div id="timePickerUI">
+                            <div class="modal__sub-steppers">
+                                <div class="modal__sub-stepper">
+                                    <div class="modal__sub-label">Minutes</div>
+                                    <div class="modal__sub-controls">
+                                        <button class="modal__sub-btn" onclick="adjustTime('min', -1)">−</button>
+                                        <span class="modal__sub-value" id="pickerMin">01</span>
+                                        <button class="modal__sub-btn" onclick="adjustTime('min', 1)">+</button>
+                                    </div>
+                                </div>
+                                <div class="modal__sub-stepper">
+                                    <div class="modal__sub-label">Seconds</div>
+                                    <div class="modal__sub-controls">
+                                        <button class="modal__sub-btn" onclick="adjustTime('sec', -5)">−</button>
+                                        <span class="modal__sub-value" id="pickerSec">00</span>
+                                        <button class="modal__sub-btn" onclick="adjustTime('sec', 5)">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="numberPickerUI" style="display:none">
+                            <div class="modal__stepper">
+                                <button class="modal__stepper-btn" onclick="adjustNumber(-1)">−</button>
+                                <span class="modal__stepper-value" id="pickerNumber">3</span>
+                                <button class="modal__stepper-btn" onclick="adjustNumber(1)">+</button>
+                            </div>
+                        </div>
+
+                        <button class="modal__confirm-btn" onclick="saveModal()">Done</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <script src="./script.js"></script>
+</body>
+
+</html>
