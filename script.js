@@ -1,11 +1,11 @@
 const state = {
-  work: 60,       // seconds
+  work: 60,
   rest: 45,
   exercises: 3,
   rounds: 6,
   roundReset: 90,
   soundOn: true,
-  phase: 'work',  // 'work' | 'rest' | 'roundReset'
+  phase: 'work',
   currentExercise: 1,
   currentRound: 1,
   timeLeft: 0,
@@ -18,9 +18,7 @@ const state = {
 
 let modalField = null;
 let modalMin = 0, modalSec = 0, modalNum = 0;
-
 let wakeLock = null;
-
 let audioCtx = null;
 
 function getAudioCtx() {
@@ -45,16 +43,14 @@ function beep(freq = 880, duration = 0.12, vol = 0.4) {
 }
 
 function tripleBeep() {
-  beep(660, 0.1); 
+  beep(660, 0.1);
   setTimeout(() => beep(660, 0.1), 150);
   setTimeout(() => beep(880, 0.2), 300);
 }
 
 async function requestWakeLock() {
   if ('wakeLock' in navigator) {
-    try {
-      wakeLock = await navigator.wakeLock.request('screen');
-    } catch(e) {}
+    try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e) {}
   }
 }
 
@@ -71,10 +67,13 @@ document.addEventListener('visibilitychange', async () => {
 function pad(n) { return String(n).padStart(2, '0'); }
 function fmtTime(s) { return `${pad(Math.floor(s/60))}:${pad(s%60)}`; }
 
+function isLastExerciseInRound() {
+  return state.currentExercise === state.exercises;
+}
+
 function calcTotal() {
-  const workouts = state.exercises * state.rounds;
-  const resets = state.rounds; 
-  return (state.work + state.rest) * workouts + state.roundReset * (state.rounds - 1);
+  const perRound = state.work * state.exercises + state.rest * (state.exercises - 1);
+  return perRound * state.rounds + state.roundReset * (state.rounds - 1);
 }
 
 function updateSetupDisplay() {
@@ -84,14 +83,12 @@ function updateSetupDisplay() {
   document.getElementById('fieldRounds').textContent = state.rounds + 'X';
   document.getElementById('fieldRoundReset').textContent = fmtTime(state.roundReset);
   document.getElementById('totalTimeDisplay').textContent = fmtTime(calcTotal());
-  // desktop panel
   document.getElementById('deskWork').textContent = fmtTime(state.work);
   document.getElementById('deskRest').textContent = fmtTime(state.rest);
   document.getElementById('deskExercises').textContent = state.exercises;
   document.getElementById('deskRounds').textContent = state.rounds + '×';
 }
 
-// ===== SCREENS =====
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('screen--active'));
   document.getElementById(id).classList.add('screen--active');
@@ -107,7 +104,6 @@ function showSetup() {
 
 function openModal(field) {
   modalField = field;
-  const modal = document.getElementById('editModal');
   const timePicker = document.getElementById('timePickerUI');
   const numPicker = document.getElementById('numberPickerUI');
 
@@ -129,7 +125,7 @@ function openModal(field) {
     document.getElementById('modalTitle').textContent = titles[field];
   }
 
-  modal.classList.add('modal--active');
+  document.getElementById('editModal').classList.add('modal--active');
 }
 
 function closeModal(e) {
@@ -149,9 +145,7 @@ function adjustTime(part, delta) {
 }
 
 function adjustNumber(delta) {
-  const min = modalField === 'exercises' ? 1 : 1;
-  const max = modalField === 'exercises' ? 20 : 20;
-  modalNum = Math.max(min, Math.min(max, modalNum + delta));
+  modalNum = Math.max(1, Math.min(20, modalNum + delta));
   document.getElementById('pickerNumber').textContent = modalNum;
 }
 
@@ -171,15 +165,14 @@ function saveModal() {
 }
 
 function startTimer() {
-  getAudioCtx(); 
+  getAudioCtx();
   state.currentExercise = 1;
   state.currentRound = 1;
   state.phase = 'work';
   state.timeLeft = state.work;
   state.totalElapsed = 0;
   state.isPaused = false;
-  const total = calcTotal();
-  state.totalTimeLeft = total;
+  state.totalTimeLeft = calcTotal();
 
   showScreen('screenTimer');
   applyPhaseStyle();
@@ -197,7 +190,6 @@ function tick() {
   state.totalElapsed++;
   state.totalTimeLeft = Math.max(0, state.totalTimeLeft - 1);
 
-  // Beep last 3 seconds
   if (state.timeLeft <= 3 && state.timeLeft > 0) beep(440 + state.timeLeft * 100, 0.08);
 
   updateTimerUI();
@@ -210,16 +202,7 @@ function tick() {
 
 function nextPhase() {
   if (state.phase === 'work') {
-    state.phase = 'rest';
-    state.timeLeft = state.rest;
-    applyPhaseStyle();
-    updateTimerUI();
-    return;
-  }
-
-  if (state.phase === 'rest') {
-    state.currentExercise++;
-    if (state.currentExercise > state.exercises) {
+    if (isLastExerciseInRound()) {
       state.currentRound++;
       if (state.currentRound > state.rounds) {
         finishWorkout();
@@ -229,9 +212,18 @@ function nextPhase() {
       state.phase = 'roundReset';
       state.timeLeft = state.roundReset;
     } else {
-      state.phase = 'work';
-      state.timeLeft = state.work;
+      state.phase = 'rest';
+      state.timeLeft = state.rest;
     }
+    applyPhaseStyle();
+    updateTimerUI();
+    return;
+  }
+
+  if (state.phase === 'rest') {
+    state.currentExercise++;
+    state.phase = 'work';
+    state.timeLeft = state.work;
     applyPhaseStyle();
     updateTimerUI();
     return;
@@ -265,15 +257,14 @@ function updateTimerUI() {
   document.getElementById('timerExerciseName').textContent = `EXERCISE ${state.currentExercise}`;
 
   const nextEx = state.currentExercise < state.exercises ? state.currentExercise + 1 : 1;
-  const nextLabel = state.phase === 'roundReset' ? `EXERCISE 1` : `EXERCISE ${nextEx}`;
+  const nextLabel = state.phase === 'roundReset' ? 'EXERCISE 1' : `EXERCISE ${nextEx}`;
   document.getElementById('timerUpNext').textContent = nextLabel;
 
   const totalPhaseTime = state.phase === 'work' ? state.work : state.phase === 'rest' ? state.rest : state.roundReset;
   const progress = totalPhaseTime > 0 ? state.timeLeft / totalPhaseTime : 0;
   const circumference = 2 * Math.PI * 110;
-  const offset = circumference * (1 - progress);
   document.getElementById('timerProgress').style.strokeDasharray = circumference;
-  document.getElementById('timerProgress').style.strokeDashoffset = offset;
+  document.getElementById('timerProgress').style.strokeDashoffset = circumference * (1 - progress);
 }
 
 function togglePause() {
@@ -295,8 +286,7 @@ function skipPhase() {
 
 function toggleSound() {
   state.soundOn = !state.soundOn;
-  const btn = document.getElementById('soundBtn');
-  btn.style.opacity = state.soundOn ? '1' : '0.4';
+  document.getElementById('soundBtn').style.opacity = state.soundOn ? '1' : '0.4';
 }
 
 function finishWorkout() {
@@ -314,7 +304,6 @@ function finishWorkout() {
   launchConfetti();
 }
 
-// ===== CONFETTI =====
 function launchConfetti() {
   const container = document.getElementById('confettiContainer');
   container.innerHTML = '';
